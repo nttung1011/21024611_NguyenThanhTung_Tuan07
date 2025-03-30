@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/index.css" />
+    <title>Danh sách sản phẩm</title>
+</head>
+
+<body>
+    <div class="content">
+
+
+        <form action="/add" method="POST" enctype="multipart/form-data" class="form-input">
+            <input type="text" name="ma_sp" placeholder="ID sản phẩm" required />
+            <input type="text" name="ten_sp" placeholder="Tên sản phẩm" required />
+            <input type="number" name="so_luong" placeholder="Số lượng sản phẩm" required />
+            <input type="file" name="image" />
+            <button type="submit">Submit</button>
+        </form>
+
+
+        <form action="/delete" method="POST">
+            <div class="table-header">
+                <h3>Danh sách sản phẩm</h3>
+                <button type="submit">Xoá</button>
+            </div>
+
+
+            <table border="1">
+                <tr>
+                    <th>Mã SP</th>
+                    <th>Tên SP</th>
+                    <th>Số Lượng</th>
+                    <th>Hình ảnh</th>
+                    <th>Chọn</th>
+                </tr>
+                <% sanPhams.forEach(item => { %>
+                    <tr>
+                        <td>
+                            <%= item.ma_sp %>
+                        </td>
+                        <td>
+                            <%= item.ten_sp %>
+                        </td>
+                        <td>
+                            <%= item.so_luong %>
+                        </td>
+                        <td><img width="50px" src="<%= item.image_url %>" /></td>
+                        <td><input type="checkbox" name="productId" value="<%= item.ma_sp %>"></td>
+                    </tr>
+                    <% }) %>
+            </table>
+        </form>
+
+    </div>
+</body>
+
+</html>

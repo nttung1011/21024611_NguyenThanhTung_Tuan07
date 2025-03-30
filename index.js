@@ -4,14 +4,19 @@ const multer = require('multer');
 const path = require('path');
 const dotenv = require('dotenv');
 const { v4: uuidv4 } = require('uuid');
-dotenv.config();
 const app = express();
 const port = 2000;
 const CLOUD_FRONT_URL = 'https://d1han884xvxa8w.cloudfront.net';
+const s3 = new AWS.S3();
+const docClient = new AWS.DynamoDB.DocumentClient();
+const tableName = 'SanPham';
+const storage = multer.memoryStorage();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('./views'));
 app.set('view engine', 'ejs');
 app.set('views', './views');
+
+dotenv.config();
 
 const config = new AWS.Config({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -20,29 +25,6 @@ const config = new AWS.Config({
 });
 AWS.config = config;
 
-const s3 = new AWS.S3();
-const docClient = new AWS.DynamoDB.DocumentClient();
-const tableName = 'SanPham';
-
-const storage = multer.memoryStorage();
-
-function checkFileType(file, cb) {
-    const fileTypes = /jpeg|jpg|png|gif/;
-    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = fileTypes.test(file.mimetype);
-    if (extname && mimetype) {
-        return cb(null, true);
-    }
-    return cb("Error: Image Only");
-}
-
-const upload = multer({
-    storage,
-    limits: { fileSize: 2 * 1024 * 1024 },
-    fileFilter(req, file, cb) {
-        checkFileType(file, cb);
-    },
-});
 
 
 app.get('/', (req, res) => {
@@ -147,6 +129,24 @@ app.post('/delete', upload.none(), (req, res) => {
     }
 
     deleteNext(0);
+});
+
+function checkFileType(file, cb) {
+    const fileTypes = /jpeg|jpg|png|gif/;
+    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = fileTypes.test(file.mimetype);
+    if (extname && mimetype) {
+        return cb(null, true);
+    }
+    return cb("Error: Image Only");
+}
+
+const upload = multer({
+    storage,
+    limits: { fileSize: 2 * 1024 * 1024 },
+    fileFilter(req, file, cb) {
+        checkFileType(file, cb);
+    },
 });
 
 
